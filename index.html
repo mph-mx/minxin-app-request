@@ -54,6 +54,23 @@
     .reqbar .x b { font-size:14px; } .reqbar .x span { font-size:12px; color:var(--muted); display:block; }
     footer { text-align:center; color:var(--muted); font-size:11px; margin-top:34px; }
     a.plain { color:var(--red); }
+    button.btn { border:none; cursor:pointer; font-family:inherit; }
+    /* App Store search modal */
+    .modal-bg { position:fixed; inset:0; background:rgba(28,25,23,.55); display:flex; align-items:flex-start;
+      justify-content:center; padding:22px 14px; overflow:auto; z-index:50; }
+    .modal { background:var(--bg); width:100%; max-width:640px; border-radius:16px; padding:22px 22px 28px;
+      position:relative; box-shadow:0 20px 60px rgba(0,0,0,.32); }
+    .modal h2 { font-size:20px; margin:0 4px 4px 0; }
+    .modal-lede { color:var(--muted); font-size:13px; margin:0 0 16px; }
+    .x-close { position:absolute; top:10px; right:14px; background:none; border:none; font-size:28px; line-height:1;
+      color:var(--muted); cursor:pointer; }
+    .modal .grid { grid-template-columns:1fr; margin-top:12px; }
+    .as-card { cursor:pointer; }
+    .as-card .go { background:var(--red); color:#fff; font-weight:700; font-size:12px; padding:8px 13px; border-radius:9px; white-space:nowrap; }
+    .as-card:hover .go { background:#9a0f25; }
+    .toast { position:fixed; bottom:22px; left:50%; transform:translateX(-50%); background:var(--ink); color:#fff;
+      padding:12px 18px; border-radius:10px; font-size:13px; z-index:60; box-shadow:0 6px 20px rgba(0,0,0,.25);
+      max-width:92%; text-align:center; }
   </style>
 </head>
 <body>
@@ -77,19 +94,34 @@
 
     <div class="empty" id="empty" style="display:none">
       <h3>Not on the approved list? · 不在白名單上？</h3>
-      <p>If the app isn't here, you can request it — the MDM team reviews within 3 school working days.<br>如未列出，你可以提交申請，MDM 團隊將於 3 個學校工作日內審核。</p>
-      <a class="btn" href="https://forms.office.com/r/uBuRUmbUU7" target="_blank" rel="noopener">Request this app <span class="zh">申請此應用程式</span></a>
+      <p>Let's find it in the App Store so we capture the exact app, then submit it to the MDM team (reviewed within 3 school working days).<br>讓我們在 App Store 中找到準確的應用程式，再交給 MDM 團隊審核（3 個學校工作日內）。</p>
+      <button class="btn" type="button" onclick="openReq(document.getElementById('q').value)">Search the App Store <span class="zh">搜尋 App Store</span></button>
     </div>
 
     <div class="reqbar">
       <div class="x"><b>Can't find what you need?</b><span>Request a new educational app · 申請新的教育應用程式</span></div>
-      <a class="btn" href="https://forms.office.com/r/uBuRUmbUU7" target="_blank" rel="noopener">Request a new app <span class="zh">提交申請</span></a>
+      <button class="btn" type="button" onclick="openReq(document.getElementById('q').value)">Request a new app <span class="zh">提交申請</span></button>
     </div>
 
     <footer>
       © Minxin Hong Kong School (Guangzhou Nansha) · IT Department<br>
       <span id="meta"></span> · apps.minxinnansha.org.cn
     </footer>
+  </div>
+
+  <!-- Request-a-new-app modal: search the Apple App Store, pick the exact app -->
+  <div class="modal-bg" id="reqModal" style="display:none">
+    <div class="modal">
+      <button class="x-close" type="button" onclick="closeReq()" aria-label="Close">&times;</button>
+      <h2>Request a new app <span class="zh" style="font-size:14px;color:var(--muted)">申請新的應用程式</span></h2>
+      <p class="modal-lede">Search the Apple App Store and pick the exact app you need. We'll carry its name straight into the request so you don't retype it.<br>在 Apple App Store 中搜尋並選擇你需要的應用程式，我們會把名稱直接帶入申請。</p>
+      <div class="searchbar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="asq" type="search" autocomplete="off" placeholder="Search the App Store… / 搜尋 App Store…">
+      </div>
+      <div class="count" id="asStatus"></div>
+      <div class="grid" id="asResults"></div>
+    </div>
   </div>
 
   <script>
@@ -125,6 +157,73 @@
     let tmr; document.getElementById('q').addEventListener('input', e => {
       clearTimeout(tmr); tmr = setTimeout(() => render(e.target.value), 120);
     });
+
+    /* ---- Request a new app: Apple App Store search (JSONP — works on static hosting) ---- */
+    const MS_FORM = 'https://forms.office.com/r/uBuRUmbUU7';
+    function openReq(seed) {
+      document.getElementById('reqModal').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      const asq = document.getElementById('asq');
+      asq.value = (seed || '').trim();
+      asq.focus();
+      if (asq.value) asSearch(asq.value);
+    }
+    function closeReq() {
+      document.getElementById('reqModal').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    let jc = 0;
+    function itunes(term, country) {
+      return new Promise((resolve, reject) => {
+        const cb = '__it' + (++jc), s = document.createElement('script');
+        const t = setTimeout(() => { fin(); reject(); }, 8000);
+        function fin() { clearTimeout(t); delete window[cb]; s.remove(); }
+        window[cb] = d => { fin(); resolve((d && d.results) || []); };
+        s.onerror = () => { fin(); reject(); };
+        s.src = 'https://itunes.apple.com/search?media=software&limit=14&country=' + country +
+          '&term=' + encodeURIComponent(term) + '&callback=' + cb;
+        document.body.appendChild(s);
+      });
+    }
+    let asTmr;
+    async function asSearch(term) {
+      term = (term || '').trim();
+      const st = document.getElementById('asStatus'), res = document.getElementById('asResults');
+      if (!term) { st.textContent = ''; res.innerHTML = ''; return; }
+      st.textContent = 'Searching the App Store… · 搜尋中…';
+      try {
+        let r = await itunes(term, 'cn');
+        if (!r.length) r = await itunes(term, 'us');
+        if (!r.length) { st.textContent = 'No App Store results for “' + term + '”. Try another name. · 沒有結果，請換個名稱。'; res.innerHTML = ''; return; }
+        st.textContent = r.length + ' App Store result' + (r.length === 1 ? '' : 's') + ' · 點選你需要的應用程式';
+        res.innerHTML = r.map(asCard).join('');
+      } catch (e) { st.textContent = 'Could not reach the App Store. Please try again. · 無法連接 App Store，請重試。'; }
+    }
+    function asCard(a) {
+      const icon = a.artworkUrl100 || a.artworkUrl60 || '';
+      const genre = a.primaryGenreName || '';
+      const payload = esc(encodeURIComponent(JSON.stringify({ n: a.trackName || '', u: a.trackViewUrl || '' })));
+      return `<div class="card as-card" onclick="pickApp('${payload}')">
+        ${icon ? `<img src="${esc(icon)}" alt="">` : '<div class="ph"></div>'}
+        <div class="meta"><div class="nm">${esc(a.trackName || '')}</div>
+        <div class="pub">${esc(a.artistName || '')}</div>
+        <div class="tags">${genre ? `<span class="tag cat">${esc(genre)}</span>` : ''}</div></div>
+        <span class="go">Request ›</span></div>`;
+    }
+    function pickApp(payload) {
+      const a = JSON.parse(decodeURIComponent(payload));
+      try { navigator.clipboard.writeText(a.n); } catch (e) {}
+      window.open(MS_FORM, '_blank', 'noopener');
+      closeReq();
+      toast('Opened the request form — we copied “' + a.n + '” for you to paste into the app-name field. · 已複製名稱，請貼到申請表。');
+    }
+    function toast(msg) {
+      const d = document.createElement('div'); d.className = 'toast'; d.textContent = msg;
+      document.body.appendChild(d); setTimeout(() => d.remove(), 6500);
+    }
+    document.getElementById('asq').addEventListener('input', e => { clearTimeout(asTmr); asTmr = setTimeout(() => asSearch(e.target.value), 350); });
+    document.getElementById('reqModal').addEventListener('click', e => { if (e.target.id === 'reqModal') closeReq(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeReq(); });
   </script>
 </body>
 </html>
