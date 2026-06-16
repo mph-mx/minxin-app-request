@@ -159,7 +159,11 @@
     });
 
     /* ---- Request a new app: Apple App Store search (JSONP — works on static hosting) ---- */
-    const MS_FORM = 'https://forms.office.com/r/uBuRUmbUU7';
+    // Microsoft Forms pre-fill: inject the chosen app's name + App Store URL into
+    // the two response params (Name of the Application / Additional Information).
+    const FORM_BASE   = 'https://forms.office.com/Pages/ResponsePage.aspx?id=FTP5a7qjGkOZS5I6KbkqWPT_4gKV42hLm7IaPr9juv9UMTlaNkVQS002VTlQVzRHU0xWTENRRjJRMC4u';
+    const FORM_Q_NAME = 're24e33d823884b21a818f59a564b4300';   // Name of the Application
+    const FORM_Q_URL  = 'r1a7065f53c32492599d75894a4fb96af';   // Additional Information
     function openReq(seed) {
       document.getElementById('reqModal').style.display = 'flex';
       document.body.style.overflow = 'hidden';
@@ -212,10 +216,11 @@
     }
     function pickApp(payload) {
       const a = JSON.parse(decodeURIComponent(payload));
-      try { navigator.clipboard.writeText(a.n); } catch (e) {}
-      window.open(MS_FORM, '_blank', 'noopener');
+      const url = FORM_BASE + '&' + FORM_Q_NAME + '=' + encodeURIComponent(a.n)
+        + (a.u ? '&' + FORM_Q_URL + '=' + encodeURIComponent(a.u) : '');
+      window.open(url, '_blank', 'noopener');
       closeReq();
-      toast('Opened the request form — we copied “' + a.n + '” for you to paste into the app-name field. · 已複製名稱，請貼到申請表。');
+      toast('Opened the request form with “' + a.n + '” already filled in — just add your child’s details and submit. · 已開啟申請表並填入名稱，請補上資料並提交。');
     }
     function toast(msg) {
       const d = document.createElement('div'); d.className = 'toast'; d.textContent = msg;
