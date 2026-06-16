@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Minxin · Request an App | 应用程式申请</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Request a new educational app for student devices at Minxin Hong Kong School / 申请在学生设备上安装新的教育应用程式">
+  <style>
+    :root { --red:#b3122c; --ink:#1c1917; --muted:#6b6560; --line:#e7e3df; --bg:#f6f4f1; }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; }
+    body { font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",Roboto,Helvetica,Arial,sans-serif;
+      color:var(--ink); background:var(--bg); line-height:1.6; }
+    .wrap { max-width:760px; margin:0 auto; padding:0 20px 64px; }
+    header { text-align:center; padding:48px 20px 32px; }
+    header img { width:72px; height:72px; object-fit:contain; }
+    .badge { display:inline-block; margin-top:14px; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--red); font-weight:700; }
+    h1 { font-size:30px; margin:6px 0 2px; letter-spacing:-.01em; }
+    h1 .zh { display:block; font-size:20px; color:var(--muted); font-weight:600; margin-top:2px; }
+    .lede { color:var(--muted); font-size:15px; max-width:560px; margin:10px auto 0; }
+    .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:28px; margin-top:22px;
+      box-shadow:0 1px 3px rgba(0,0,0,.04); }
+    .card.accent { border-top:5px solid var(--red); }
+    h2 { font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:0 0 16px; }
+    ol.steps { list-style:none; counter-reset:s; margin:0; padding:0; }
+    ol.steps li { counter-increment:s; position:relative; padding:0 0 18px 46px; }
+    ol.steps li:last-child { padding-bottom:0; }
+    ol.steps li::before { content:counter(s); position:absolute; left:0; top:0; width:30px; height:30px;
+      background:var(--red); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-weight:700; font-size:14px; }
+    ol.steps b { font-size:15px; }
+    ol.steps .zh { color:var(--muted); font-size:13px; }
+    .btn { display:block; text-align:center; text-decoration:none; padding:16px 20px; border-radius:12px; font-weight:700;
+      font-size:16px; transition:transform .04s ease, background .15s ease; }
+    .btn:active { transform:translateY(1px); }
+    .btn-primary { background:var(--red); color:#fff; }
+    .btn-primary:hover { background:#9a0f25; }
+    .btn-primary .zh { display:block; font-weight:600; font-size:13px; opacity:.9; }
+    .btn-secondary { background:#fff; color:var(--ink); border:1px solid var(--line); margin-top:12px; }
+    .btn-secondary:hover { background:#faf8f6; }
+    .btn-secondary .zh { color:var(--muted); font-weight:500; font-size:13px; }
+    .note { font-size:13px; color:var(--muted); margin-top:16px; }
+    .note .zh { display:block; }
+    footer { text-align:center; color:var(--muted); font-size:12px; margin-top:40px; }
+    a.link { color:var(--red); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <img src="logo.png" alt="Minxin Hong Kong School">
+      <div class="badge">Minxin Hong Kong School · 民心港人子弟学校</div>
+      <h1>Request an App<span class="zh">应用程式申请</span></h1>
+      <p class="lede">
+        Only apps on the school's approved MDM whitelist may be installed on student devices.
+        To request a new educational app, follow the steps below.
+        <br><span style="color:var(--muted)">只有列入学校 MDM 批准白名单的应用程式才可安装于学生设备。如需申请新的教育应用程式，请按以下步骤进行。</span>
+      </p>
+    </header>
+
+    <div class="card">
+      <h2>How it works · 申请流程</h2>
+      <ol class="steps">
+        <li><b>Find the app</b> in the App Store and confirm its exact name.
+          <span class="zh">在应用商店中确认所需应用程式的名称。</span></li>
+        <li><b>Check the approved list</b> first — it may already be available.
+          <span class="zh">先查看“白名单”，确认该应用是否已获批准。</span></li>
+        <li><b>Submit the request form</b> with the app name and its educational purpose.
+          <span class="zh">填写申请表，说明应用名称及其教育用途。</span></li>
+        <li><b>Review</b> — the MDM team responds within <b>3 school working days</b>; approved apps are added to the whitelist and you install from the App Store yourself.
+          <span class="zh">MDM 团队将于 <b>3 个学校工作日</b>内审核；获批准的应用会加入白名单，学生需自行从应用商店安装。</span></li>
+      </ol>
+    </div>
+
+    <div class="card accent">
+      <a class="btn btn-primary" href="https://forms.office.com/r/uBuRUmbUU7" target="_blank" rel="noopener">
+        Submit a Request <span class="zh">提交申请</span>
+      </a>
+      <a class="btn btn-secondary" href="https://minxinnansha.sharepoint.com/sites/ITDepartment/_layouts/15/guestaccess.aspx?share=EQSOQNWZNcBGrzntkrpuVOwBXJGZMN8AmEcIySqfjVsu2A&rtime=NVBoZuTX3Eg" target="_blank" rel="noopener">
+        Check the Approved List <span class="zh">查看白名单</span>
+      </a>
+      <p class="note">
+        Not approved but you think it's important? Reply to the review with more detail, or contact the IT Department.
+        <span class="zh">若未获批准但你认为该应用重要，请提供进一步理由，或联系资讯科技部。</span>
+      </p>
+    </div>
+
+    <footer>
+      © Minxin Hong Kong School (Guangzhou Nansha) · IT Department<br>
+      apps.minxinnansha.org.cn
+    </footer>
+  </div>
+</body>
+</html>
